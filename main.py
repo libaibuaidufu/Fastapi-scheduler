@@ -23,7 +23,11 @@ from TreeNode import TreeNode
 from aps_server import logger
 
 scheduler_script_name = 'scheduler_script'
+
 script_path = os.path.join(os.getcwd(), scheduler_script_name)
+if not os.path.exists(script_path):
+    os.mkdir(script_path)
+
 app = FastAPI()
 dburl = DatabaseURL(f'mysql+pymysql://root:password@localhost:3306/dbname')
 database = Database(dburl)
