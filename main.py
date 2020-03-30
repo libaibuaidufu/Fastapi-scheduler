@@ -25,8 +25,7 @@ from aps_server import logger
 scheduler_script_path = 'scheduler_script'
 script_path = os.path.join(os.getcwd(), scheduler_script_path)
 app = FastAPI()
-# dburl = DatabaseURL(f'mysql+pymysql://root:password@localhost:3306/dbname')
-dburl = DatabaseURL(f'mysql+pymysql://root:root1234@192.168.5.54:3306/dbname')
+dburl = DatabaseURL(f'mysql+pymysql://root:password@localhost:3306/dbname')
 database = Database(dburl)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -72,10 +71,15 @@ scheduler = None
 @app.on_event('startup')
 async def startup():
     global conn, bgsrv, scheduler
-    conn = rpyc.connect("localhost", 12345)
-    # create a bg thread to process incoming events
-    bgsrv = rpyc.BgServingThread(conn)
-    scheduler = conn.root
+
+    try:
+        conn = rpyc.connect("localhost", 12345)
+        # create a bg thread to process incoming events
+        bgsrv = rpyc.BgServingThread(conn)
+        scheduler = conn.root
+    except ConnectionRefusedError as e:
+        logger.error("请先执行 aps_server.py,否则无法使用web")
+        raise
     await database.connect()
 
 
