@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="{{ url_for('static',path='/layui/css/layui.css') }}">
+    <style>
+        .margin-center {
+            margin: 0 auto;
+        }
+
+        .content {
+            width: 1200px;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .layui-form-label {
+            width: 150px;
+        }
+
+        .db_jobs {
+            margin-top: 50px;
+        }
+
+        .run_jobs {
+            margin-top: 50px;
+        }
+
+        .update_job {
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+<div class="content margin-center ">
+    <h1 class="text-center" style="margin: 25px 0px">Fastapi-scheduler</h1>
+    <div class="db_jobs">
+        <h2 class="text-center">可以执行项目</h2>
+        <table class="layui-table">
+            <colgroup>
+                <col width="70">
+                <col width="150">
+                <col width="200">
+                <col width="250">
+                <col width="200">
+                <col>
+            </colgroup>
+            <thead>
+            <tr>
+                <th>id</th>
+                <th>任务名称</th>
+                <th>任务描述</th>
+                <th>脚本位置</th>
+                <th>任务计划</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for data in job_results %}
+                <tr>
+                    <td>{{ data.id }}</td>
+                    <td>{{ data.schedule_name }}</td>
+                    <td>{{ data.schedule_desc }}</td>
+                    <td>{{ data.script_name }}</td>
+                    <td>{{ data.task_plan }}</td>
+                    <td align="center">
+                        <button type="button" class="layui-btn" onclick="modifi_jobs(JSON.stringify({{ data }}))">编辑
+                        </button>
+                        <button type="button" class="layui-btn layui-btn-normal" onclick="add_job('{{ data.id }}')">执行
+                        </button>
+                        <button type="button" class="layui-btn layui-btn-danger"
+                                onclick="delete_db_job('{{ data.id }}')">删除
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="run_jobs">
+        <h2 class="text-center">运行中的项目</h2>
+        <table class="layui-table">
+            <colgroup>
+                <col width="50">
+                <col width="110">
+                <col width="70">
+                <col width="250">
+                <col width="180">
+                <col width="250">
+                <col width="280">
+            </colgroup>
+            <thead>
+            <tr>
+                <th>id</th>
+                <th>任务名称</th>
+                <th>状态</th>
+                <th>任务执行计划</th>
+                <th>下一次执行时间</th>
+                <th>脚本名称</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for data in run_jobs %}
+                <tr>
+                    <td>{{ data.id }}</td>
+                    <td>{{ data.name }}</td>
+                    <td>{{ data.pending }}</td>
+                    <td>{{ data.cron_info }}</td>
+                    <td>{{ data.next_run_time }}</td>
+                    <td>{{ data.func_ref }}</td>
+
+                    <td align="center">
+                        <button type="button" class="layui-btn layui-btn-sm"
+                                onclick="on_modifi_job(JSON.stringify({{ data }}))">
+                            编辑
+                        </button>
+                        <button type="button" class="layui-btn layui-btn-normal layui-btn-sm"
+                                onclick="resume_job('{{ data.id }}')">开始
+                        </button>
+                        <button type="button" class="layui-btn layui-btn-warm layui-btn-sm"
+                                onclick="pause_job('{{ data.id }}')">暂停
+                        </button>
+
+                        <button type="button" class="layui-btn layui-btn-danger layui-btn-sm"
+                                onclick="remove_job('{{ data.id }}')">
+                            删除
+                        </button>
+
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="update_job">
+        <h2 class="text-center" style="margin-bottom: 10px">修改任务</h2>
+        <form class="layui-form" id="showmodel">
+            <div class="layui-form-item">
+                <input type="hidden" id='id' name="id" value="">
+
+                <label class="layui-form-label">脚本位置</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="script_name" placeholder="请输入" autocomplete="off" class="layui-input"
+                           id="script_name"
+                           value="">
+                </div>
+
+                <label class="layui-form-label">任务名称</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="schedule_name" placeholder="请输入" autocomplete="off" class="layui-input"
+                           id="schedule_name"
+                           value="">
+                </div>
+                <label class="layui-form-label">任务描述</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="schedule_desc" placeholder="请输入" autocomplete="off" class="layui-input"
+                           id="schedule_desc"
+                           value="">
+                </div>
+
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">秒钟：second</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="cron_second" placeholder="请输入" autocomplete="off" class="layui-input"
+                           id="cron_second"
+                           value="">
+                </div>
+                <label class="layui-form-label">分钟：minute</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="cron_minutes" placeholder="请输入" autocomplete="off" class="layui-input"
+                           id="cron_minutes"
+                           value="">
+                </div>
+                <label class="layui-form-label">小时:hour</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="cron_hour" placeholder="请输入" autocomplete="off" class="layui-input"
+                           id="cron_hour"
+                           value="">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">天数:day</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="cron_day_of_month" placeholder="请输入" autocomplete="off" class="layui-input"
+                           id="cron_day_of_month"
+                           value="">
+                </div>
+                <label class="layui-form-label">每周天:day_of_week</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="cron_day_of_week" placeholder="请输入" autocomplete="off" class="layui-input"
+                           id="cron_day_of_week"
+                           value="">
+                </div>
+                <label class="layui-form-label">月数:month</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="cron_month" placeholder="请输入" autocomplete="off" class="layui-input"
+                           id="cron_month"
+                           value="">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-inline">
+                    <button class="layui-btn" lay-submit lay-filter="nowUpdate" id="tip_update_run_job">修改运行任务</button>
+
+                </div>
+                <div class="layui-input-inline" style="float:right;">
+                    <button type="layui-btn" class="layui-btn layui-btn-primary" onclick="reset_form()">重置</button>
+                </div>
+                <div class="layui-input-inline" style="float:right;">
+                    <button class="layui-btn" lay-submit lay-filter="formDemo" id="tip_update_db_job">立即提交</button>
+                    <button class="layui-btn" lay-submit lay-filter="add_db" id="tip_add_db_job">新增</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+    <div class="upload_py">
+        <div style="float: left">
+            <div id="file_list"></div>
+        </div>
+        <div class="layui-upload" style="float:left;">
+            <button type="button" class="layui-btn layui-btn-normal" id="change_file">选择文件</button>
+            <button type="button" class="layui-btn" id="upload_file">开始上传</button>
+        </div>
+        <div style="clear:both"></div>
+    </div>
+
+</div>
+<script src="{{ url_for('static',path='/js/jquery-3.4.1.min.js') }}"></script>
+<script src="{{ url_for('static',path='/layui/layui.js') }}"></script>
+<script>
+    //重新刷新页面
+    function reload_html() {
+        setTimeout(function () {
+            window.location.reload()
+        }, 500);
+    }
+
+    //一般直接写在一个js文件中
+    layui.use(['layer', 'form', 'upload', 'transfer', 'tree'], function () {
+        var layer = layui.layer
+            , form = layui.form
+            , upload = layui.upload
+            , tree = layui.tree;
+        //监听提交
+        form.on('submit(formDemo)', function (data) {
+            // console.log(data.field)
+            update_db_job(data.field);
+
+            // layer.msg(JSON.stringify(data.field));
+            return false;
+        });
+        form.on('submit(nowUpdate)', function (data) {
+            reschedule_job(data.field);
+            return false;
+        });
+        form.on('submit(add_db)', function (data) {
+            add_db_job(data.field);
+            return false;
+        });
+        //选完文件后不自动上传
+        upload.render({
+            elem: '#change_file'
+            , url: '/upload/' //改成您自己的上传接口
+            , auto: false
+            , accept: 'file'
+            //,multiple: true
+            , bindAction: '#upload_file'
+            , done: function (res) {
+                if (res.result === "succ") {
+                    layer.msg('上传成功');
+                    reload_html()
+                } else if (res.result === 'fail') {
+                    layer.msg(res.msg);
+                }
+                console.log(res)
+            }, error: function (error) {
+                layer.msg('上传失败')
+            }
+        });
+        //渲染
+        tree.render({
+            elem: '#file_list'  //绑定元素
+            , data:{{ script_name_list|safe }}
+        });
+    })
+</script>
+<script>
+
+
+    //执行db中的job
+    function add_job(job_id) {
+        let data = {'id': job_id};
+        let str_data = JSON.stringify(data);
+        $.ajax({
+            url: '{{ url_for("add_job") }}',
+            dataType: "json",
+            type: "POST",
+            data: str_data,
+            success: function succ(data) {
+                layer.msg("添加成功")
+                reload_html()
+            },
+            error: function (error) {
+                layer.msg("添加失败")
+            }
+        })
+    }
+
+    // 删除运行中的job
+    function remove_job(job_id) {
+        $.ajax({
+            url: '{{ url_for("remove_job") }}',
+            dataType: "json",
+            type: "POST",
+            data: JSON.stringify({'id': job_id}),
+            success: function succ(data) {
+                layer.msg("删除成功")
+                reload_html()
+            },
+            error: function (error) {
+                layer.msg("添加失败")
+            }
+        })
+    }
+
+    // 暂停运行中的job
+    function pause_job(job_id) {
+        $.ajax({
+            url: '{{ url_for("pause_job") }}',
+            dataType: "json",
+            type: "POST",
+            data: JSON.stringify({'id': job_id}),
+            success: function succ(data) {
+                layer.msg("暂停成功");
+                reload_html()
+            },
+            error: function (error) {
+                layer.msg("暂停失败")
+            }
+        })
+    }
+
+    // 重新启动运行中的job
+    function resume_job(job_id) {
+        $.ajax({
+            url: '{{ url_for("resume_job") }}',
+            dataType: "json",
+            type: "POST",
+            data: JSON.stringify({'id': job_id}),
+            success: function succ(data) {
+                layer.msg("重新开始成功");
+                reload_html()
+            },
+            error: function (error) {
+                layer.msg("重新开始失败")
+            }
+        })
+    }
+
+    // 映射  db中job到表单
+    function modifi_jobs(data) {
+        var result = JSON.parse(data);
+        $("#id").attr("value", result.id);
+        $("#script_name").attr("value", result.script_name);
+        $("#schedule_name").attr("value", result.schedule_name);
+        $("#schedule_desc").attr("value", result.schedule_desc);
+        $("#cron_second").attr("value", result.cron_second);
+        $("#cron_minutes").attr("value", result.cron_minutes);
+        $("#cron_hour").attr("value", result.cron_hour);
+        $("#cron_day_of_month").attr("value", result.cron_day_of_month);
+        $("#cron_day_of_week").attr("value", result.cron_day_of_week);
+        $("#cron_month").attr("value", result.cron_month);
+    }
+
+    // 映射  运行中job到表单
+    function on_modifi_job(data) {
+        var result = JSON.parse(data);
+        $("#id").attr("value", result.id);
+        $("#script_name").attr("value", result.script_name);
+        $("#schedule_name").attr("value", result.name);
+        $("#schedule_desc").attr("value", "");
+        $("#cron_second").attr("value", result.cron_info_dict.second);
+        $("#cron_minutes").attr("value", result.cron_info_dict.minute);
+        $("#cron_hour").attr("value", result.cron_info_dict.hour);
+        $("#cron_day_of_month").attr("value", result.cron_info_dict.day);
+        $("#cron_day_of_week").attr("value", result.cron_info_dict.day_of_week);
+        $("#cron_month").attr("value", result.cron_info_dict.month);
+    }
+
+    // 更新  db中job到表单
+    function update_db_job(data) {
+        let str_data = JSON.stringify(data);
+        $.ajax({
+            url: '{{ url_for('update_db_job') }}',
+            dataType: "json",
+            type: "POST",
+            data: str_data,
+            success: function succ(data) {
+                layer.msg("添加成功")
+                reload_html()
+            },
+            error: function (error) {
+                layer.msg("添加失败")
+            }
+        })
+    }
+
+    // 更新  运行中job到表单
+    function reschedule_job(data) {
+        let str_data = JSON.stringify(data);
+        $.ajax({
+            url: '{{ url_for("reschedule_job") }}',
+            dataType: "json",
+            type: "POST",
+            data: str_data,
+            success: function succ(data) {
+                layer.msg("添加成功");
+                reload_html()
+            },
+            error: function (error) {
+                layer.msg("添加失败")
+            }
+        })
+    }
+
+    // 重置 表单
+    function reset_form() {
+        console.log("ii")
+        //document.getElementById("showmodel").reset();
+        $("#showmodel")[0].reset()
+    }
+
+    // 新增 job到db中
+    function add_db_job(data) {
+        let str_data = JSON.stringify(data);
+        $.ajax({
+            url: '{{ url_for('add_db_job') }}',
+            dataType: "json",
+            type: "POST",
+            data: str_data,
+            success: function succ(data) {
+                layer.msg("添加成功");
+                reload_html()
+            },
+            error: function (error) {
+                layer.msg("添加失败")
+            }
+        })
+
+    }
+
+    // 删除 db中job
+    function delete_db_job(id) {
+        $.ajax({
+            url: '{{ url_for("delete_db_job") }}',
+            dataType: "json",
+            type: "POST",
+            data: JSON.stringify({'id': id}),
+            success: function succ(data) {
+                layer.msg("删除成功");
+                reload_html()
+            },
+            error: function (error) {
+                layer.msg("删除失败")
+            }
+        })
+    }
+</script>
+<script>
+    //鼠标悬停提示特效
+    function tip_id_msg(id, msg) {
+        $(id).hover(function () {
+            openMsg(id, msg);
+        }, function () {
+            layer.close(subtips);
+        });
+
+    }
+
+    function openMsg(id, msg) {
+        subtips = layer.tips(msg, id, {tips: [1, '#ff6700'], time: 30000});
+    }
+
+    tip_id_msg('#tip_add_db_job', '这个是新增到数据库中');
+    tip_id_msg('#tip_update_run_job', '这个是更新正在运行的job');
+    tip_id_msg('#tip_update_db_job', '这个是更新数据库中的job');
+
+
+</script>
+</body>
+</html>
