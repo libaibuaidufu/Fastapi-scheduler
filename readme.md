@@ -78,6 +78,7 @@ git clone  https://github.com/libaibuaidufu/Fastapi-scheduler.git
 
 - 脚本执行后，对脚本修改，再次执行可能无效。（原因可能是 第一次已经对脚本进行加载无法再次更新）
 - 执行 class 类时，用函数在外面运行最好 ，类似 example_class.py
+- 拷贝 rpc_server 里面的脚本 ，如果执行报错后，就算修改后再次执行也会出错 ，所以只能修改文件名称 再次 拷贝使用。
 
 
 
