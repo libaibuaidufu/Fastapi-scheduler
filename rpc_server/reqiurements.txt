@@ -1,0 +1,2 @@
+APScheduler==3.6.3
+rpyc==4.1.4

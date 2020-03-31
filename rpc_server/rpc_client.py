@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Time    : 2020/3/27 14:39
-# @File    : aps_client.py
+# @File    : rpc_client.py
 # @author  : dfkai
 # @Software: PyCharm
 """

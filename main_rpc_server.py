@@ -4,6 +4,7 @@
 # @File    : main_rpc_server.py
 # @author  : dfkai
 # @Software: PyCharm
+import os
 import time
 from datetime import datetime
 from typing import List
@@ -19,11 +20,17 @@ from starlette.requests import Request
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 
+from TreeNode import TreeNode
 from rpc_server.rpc_server import logger
 
+scheduler_script_name = 'rpc_server/scheduler_script'
+
+script_path = os.path.join(os.getcwd(), scheduler_script_name)
+if not os.path.exists(script_path):
+    os.mkdir(script_path)
+
 app = FastAPI()
-DATABASE_URL = f'mysql+pymysql://root:root1234@192.168.5.54:3306/dbname'
-# DATABASE_URL = f'mysql+pymysql://root:password@localhost:3306/dbname'
+DATABASE_URL = f'mysql+pymysql://root:password@localhost:3306/dbname'
 dburl = DatabaseURL(DATABASE_URL)
 database = Database(dburl)
 
@@ -98,7 +105,7 @@ async def startup():
     global conn, bgsrv, scheduler
 
     try:
-        conn = rpyc.connect("rpc_server", 12345)
+        conn = rpyc.connect("localhost", 12345)
         # create a bg thread to process incoming events
         bgsrv = rpyc.BgServingThread(conn)
         scheduler = conn.root
@@ -152,7 +159,8 @@ async def index(request: Request):
         })
 
     # 获取脚本文件
-    script_name_list = []
+    tree_node = TreeNode('脚本文件')
+    script_name_list = [tree_node.get_node(script_path).get_name()]
     return templates.TemplateResponse("index.html",
                                       {"request": request, 'run_jobs': run_jobs, 'job_results': job_results,
                                        'script_name_list': script_name_list})
@@ -304,9 +312,31 @@ async def delete_db_job(job: UpdateJob):
 @app.post("/upload/")
 async def upload_file(file: UploadFile = File(...)):
     try:
-        return {"filename": file.filename, 'result': 'fail', 'msg': "请使用 main_rpc_server.py 才可以使用上传！"}
+        file_path = os.path.join(script_path, file.filename)
+        if os.path.exists(file_path):
+            return {'result': 'fail', 'msg': '文件名重复'}
+        with open(file_path, 'wb') as f:
+            f.write(file.file.read())
+        return {"filename": file.filename, 'result': 'succ'}
     except Exception as e:
         raise HTTPException(status_code=400, detail="file upload fail")
+
+
+@app.get('/list_file/')
+async def list_file():
+    def has_py(file: str) -> bool:
+        if file.endswith('.py') and not file.startswith('__'):
+            return True
+        return False
+
+    data = list(filter(has_py, os.listdir(script_path)))
+    script_path_list = []
+    for index, i in enumerate(data):
+        script_path_list.append(
+            {"value": index + 1, "title": i, "disabled": "", "checked": ""}
+
+        )
+    return {'data': script_path_list}
 
 
 if __name__ == '__main__':

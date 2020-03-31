@@ -1,0 +1,20 @@
+version: '2.0'
+services:
+  rpc_server:
+    container_name: rpc-server
+    build:
+      context: .
+      dockerfile: Dockerfile_rpc_server
+    ports:
+      - "12345:12345"
+  fastapi_sche:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fastapi-sche
+    ports:
+      - "8081:80"
+    volumes:
+      - .:/app
+    links:
+      - rpc_server

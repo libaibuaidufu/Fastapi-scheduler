@@ -77,6 +77,8 @@
                     </td>
                 </tr>
             {% endfor %}
+
+
             </tbody>
         </table>
     </div>
@@ -219,16 +221,18 @@
         </form>
 
     </div>
-    <div class="upload_py">
-        <div style="float: left">
-            <div id="file_list"></div>
+    {% if script_name_list %}
+        <div class="upload_py">
+            <div style="float: left">
+                <div id="file_list"></div>
+            </div>
+            <div class="layui-upload" style="float:left;">
+                <button type="button" class="layui-btn layui-btn-normal" id="change_file">选择文件</button>
+                <button type="button" class="layui-btn" id="upload_file">开始上传</button>
+            </div>
+            <div style="clear:both"></div>
         </div>
-        <div class="layui-upload" style="float:left;">
-            <button type="button" class="layui-btn layui-btn-normal" id="change_file">选择文件</button>
-            <button type="button" class="layui-btn" id="upload_file">开始上传</button>
-        </div>
-        <div style="clear:both"></div>
-    </div>
+    {% endif %}
 
 </div>
 <script src="{{ url_for('static',path='/js/jquery-3.4.1.min.js') }}"></script>
@@ -236,6 +240,7 @@
 <script>
     //重新刷新页面
     function reload_html() {
+        console.log("gg")
         setTimeout(function () {
             window.location.reload()
         }, 500);

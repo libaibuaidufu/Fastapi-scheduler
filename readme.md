@@ -4,21 +4,52 @@
 
 ## 快速使用：
 
-1. 导入 scheduler.sql 到 mysql
+本地启动：
 
-2. 启动 aps-server.py
+1. 启动 rpc-server.py 
 
-   ```
-   python aps-server.py
-   ```
-
-3. 启动 main.py
-
-   ```
-   python main.py
+   ```bash
+   cd rpc_server
+   python rpc-server.py
    ```
 
-4. 打开 http://localhost:8081
+2. 启动 main_rpc_server.py
+
+   ```
+   python main_rpc_server.py
+   ```
+
+3. 打开 http://localhost:8081
+
+docker部署：
+
+1. 使用 docker-compose
+
+   ```
+   docker-compose up -d
+   ```
+
+2.  打开：http://ip:8081
+
+3. 删除  docker-compose down
+
+4. 再启动任务后，查询有点慢。。。
+
+5. 复制脚本到 rpc_server 容器里面
+
+   ```bash
+   docker cp xx.py rpc-server:/usr/src/app/scheduler_script/
+   ```
+
+6. 安装 脚本中使用到的 库 
+
+   ```bash
+   docker exec -it rpc_server pip install xxx
+   ```
+
+7. 再到 web 中去添加任务
+
+
 
 ## 已实现功能：
 
