@@ -12,7 +12,7 @@
 git clone  https://github.com/libaibuaidufu/Fastapi-scheduler.git
 ```
 
-本地启动：
+**1.本地启动：**
 
 1. 启动 rpc-server.py 
 
@@ -29,7 +29,7 @@ git clone  https://github.com/libaibuaidufu/Fastapi-scheduler.git
 
 3. 打开 http://localhost:8081
 
-docker部署：
+**2.docker部署：**
 
 1. 使用 docker-compose
 
