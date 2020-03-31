@@ -22,8 +22,7 @@ from starlette.templating import Jinja2Templates
 from rpc_server.rpc_server import logger
 
 app = FastAPI()
-DATABASE_URL = f'mysql+pymysql://root:root1234@192.168.5.54:3306/dbname'
-# DATABASE_URL = f'mysql+pymysql://root:password@localhost:3306/dbname'
+DATABASE_URL = f'mysql+pymysql://root:password@localhost:3306/dbname'
 dburl = DatabaseURL(DATABASE_URL)
 database = Database(dburl)
 
