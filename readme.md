@@ -4,6 +4,8 @@
 
 ## 快速使用：
 
+**注意： 修改 main.py 或者 main_rpc_server.py 的 mysql连接**
+
 本地启动：
 
 1. 启动 rpc-server.py 
