@@ -3,4 +3,5 @@ ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 COPY . /app
-RUN pip3 install -i https://mirrors.aliyun.com/pypi/simple/ -r /app/reqiurements.txt
+RUN pip install -i https://mirrors.aliyun.com/pypi/simple/ -r /app/reqiurements.txt
+

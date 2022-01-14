@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Time    : 2020/3/30 14:23
 # @File    : TreeNode.py
@@ -30,7 +29,7 @@ class TreeNode(object):
 
     def get_node(self, file_path: str, node: Node = None) -> Node:
         if not node:
-            node = Node(self.script_name,[])
+            node = Node(self.script_name, [])
         for i in os.listdir(file_path):
             if os.path.isdir(os.path.join(file_path, i)):
                 if not i.startswith('__'):

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Time    : 2020/3/27 14:39
 # @File    : rpc_server.py
@@ -56,7 +55,6 @@ class SchedulerService(rpyc.Service):
 
     def exposed_print_jobs(self, jobstore=None):
         return scheduler.print_jobs(jobstore)
-
 
 
 if __name__ == '__main__':

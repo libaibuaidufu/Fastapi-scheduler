@@ -12,8 +12,10 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: fastapi-sche
+    depends_on:
+      - rpc_server
     ports:
-      - "8081:80"
+      - "8080:80"
     volumes:
       - .:/app
     links:

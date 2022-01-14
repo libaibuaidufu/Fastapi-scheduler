@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Time    : 2020/3/27 14:39
 # @File    : rpc_client.py
@@ -14,7 +13,6 @@ After that, it unschedules the job and exits.
 from time import sleep
 
 import rpyc
-
 
 conn = rpyc.connect('localhost', 12345)
 job = conn.root.add_job('scheduler_script.test:print_text', 'interval', args=['Hello, World'], seconds=2)

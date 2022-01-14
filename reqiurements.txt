@@ -15,7 +15,6 @@ databases==0.2.6
 dataclasses==0.7
 et-xmlfile==1.0.1
 fastapi==0.52.0
-freeze==1.0.10
 h11==0.9.0
 idna==2.9
 idna-ssl==1.1.0

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Time    : 2020/3/25 11:24
 # @File    : main_rpc_server.py
@@ -21,6 +20,7 @@ from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 
 from TreeNode import TreeNode
+from config import DATABASE_URL
 from rpc_server.rpc_server import logger
 
 scheduler_script_name = 'rpc_server/scheduler_script'
@@ -30,7 +30,6 @@ if not os.path.exists(script_path):
     os.mkdir(script_path)
 
 app = FastAPI()
-DATABASE_URL = f'mysql+pymysql://root:password@localhost:3306/dbname'
 dburl = DatabaseURL(DATABASE_URL)
 database = Database(dburl)
 
@@ -46,19 +45,19 @@ sche = sqlalchemy.Table(
     "scheduler",
     metadata,
     sqlalchemy.Column('id', sqlalchemy.Integer, primary_key=True),  # int
-    sqlalchemy.Column('script_name', sqlalchemy.String(100), nullable=False),  # varchar
-    sqlalchemy.Column('schedule_name', sqlalchemy.String(50)),  # varchar
-    sqlalchemy.Column('schedule_desc', sqlalchemy.String(255)),  # varchar
-    sqlalchemy.Column('cron_second', sqlalchemy.String(20), default='*'),  # varchar
-    sqlalchemy.Column('cron_minutes', sqlalchemy.String(20), default='*'),  # varchar
-    sqlalchemy.Column('cron_hour', sqlalchemy.String(20), default='*'),  # varchar
-    sqlalchemy.Column('cron_day_of_month', sqlalchemy.String(50), default='*'),  # varchar
-    sqlalchemy.Column('cron_day_of_week', sqlalchemy.String(50), default='*'),  # varchar
-    sqlalchemy.Column('cron_month', sqlalchemy.String(20), default='*'),  # varchar
-    sqlalchemy.Column('run_type', sqlalchemy.String(1)),  # varchar
-    sqlalchemy.Column('enabled', sqlalchemy.SmallInteger),  # int
-    sqlalchemy.Column('is_lock', sqlalchemy.SmallInteger),  # int
-    sqlalchemy.Column('priority', sqlalchemy.SmallInteger),  # int
+    sqlalchemy.Column('script_name', sqlalchemy.String(100), nullable=False, comment='脚本位置'),  # varchar
+    sqlalchemy.Column('schedule_name', sqlalchemy.String(50), comment='定时任务名称'),  # varchar
+    sqlalchemy.Column('schedule_desc', sqlalchemy.String(255), comment='定时任务描述'),  # varchar
+    sqlalchemy.Column('cron_second', sqlalchemy.String(20), default='*', comment='定时任务-秒'),  # varchar
+    sqlalchemy.Column('cron_minutes', sqlalchemy.String(20), default='*', comment='定时任务-分'),  # varchar
+    sqlalchemy.Column('cron_hour', sqlalchemy.String(20), default='*', comment='定时任务-时'),  # varchar
+    sqlalchemy.Column('cron_day_of_month', sqlalchemy.String(50), default='*', comment='定时任务-每月几号'),  # varchar
+    sqlalchemy.Column('cron_day_of_week', sqlalchemy.String(50), default='*', comment='定时任务-每周星期几'),  # varchar
+    sqlalchemy.Column('cron_month', sqlalchemy.String(20), default='*', comment='定时任务-月'),  # varchar
+    sqlalchemy.Column('run_type', sqlalchemy.String(1), comment='运行类型 1 启动'),  # varchar
+    sqlalchemy.Column('enabled', sqlalchemy.SmallInteger, comment=''),  # int
+    sqlalchemy.Column('is_lock', sqlalchemy.SmallInteger, comment=''),  # int
+    sqlalchemy.Column('priority', sqlalchemy.SmallInteger, comment=''),  # int
     sqlalchemy.Column('create_time', sqlalchemy.DateTime, default=datetime.now),  # datetime
 )
 
